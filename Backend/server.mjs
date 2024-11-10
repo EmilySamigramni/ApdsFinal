@@ -7,25 +7,29 @@ import customer from "./routes/customer.mjs";
 import employee from "./routes/employee.mjs";
 import transaction from "./routes/transaction.mjs";
 
+const app = express();
 const port = 3000;
-const app = express()
 
-app.use(cors());
+const allowedOrigins = ['https://your-frontend-domain.com']; 
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
-app.use((reg,res,next) => {
+app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Acces-Control-Allow-Headers', '*');
-    res.setHeader('Acces-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
     next();
-})
+});
 
-app.use("/customer",customer);
-app.route("/customer",customer);
+app.use("/customer", customer);
 app.use("/employee", employee);
-app.route("/employee", employee);
-app.use("/transaction", transaction)
+app.use("/transaction", transaction);
 
-let server = http.createServer(app)
-console.log(port);
-server.listen(port)
+const sslOptions = {
+    key: fs.readFileSync("path/to/ssl/key.pem"), 
+    cert: fs.readFileSync("path/to/ssl/cert.pem")  
+};
+
+https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`Server running securely on port ${port}`);
+});
